@@ -99,20 +99,30 @@ Router.post("/register", async (req, res) => {
 Router.post("/login", async (req, res) => {
   try {
     const { error } = validateAuth(req.body);
-    console.log(req.body);
+
     if (error) return res.status(400).send(error.details[0].message);
     const user = await Auth.findOne({ email: req.body.email });
     if (!user) return res.status(400).send("Invalid email or password");
     const validPassword = comparePassword(req.body.password, user.password);
     if (!validPassword)
       return res.status(400).send("Invalid email or password");
-    const token = generateAuthToken(user);
+    const Profile = await User.findOne({
+      auth: user._id,
+    });
+
+    const token = generateAuthToken({
+      _id: user._id,
+      email: user.email,
+      Role: user.Role,
+      userid: Profile._id,
+    });
     res.send({
       token: token,
       isapproved: user.isapproved,
       user: {
         id: user._id,
         email: user.email,
+        userid: Profile._id,
       },
     });
   } catch (err) {

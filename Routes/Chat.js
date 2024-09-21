@@ -17,7 +17,6 @@ const initializeSocket = (server) => {
 
   io.use(async (socket, next) => {
     try {
-      console.log("Authenticating socket...");
       await AuthMiddleware(socket.request, {}, next);
     } catch (err) {
       next(err);
@@ -25,7 +24,7 @@ const initializeSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    const userId = socket.request.user.unique;
+    const userId = socket.request.user.userid;
 
     userSocketMap.set(userId, socket.id);
 

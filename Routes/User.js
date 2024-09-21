@@ -38,8 +38,8 @@ Router.get("/me", Authetication, async (req, res) => {
   await new Promise((resolve) => setTimeout(resolve, 5000)); // delay for 3 seconds
 
   try {
-    const user = await User.findOne({ auth: req.user._id }).select("-password");
-    console.log(user);
+    const user = await User.findById(req.user.userid).select("-password");
+
     res.send(user);
   } catch (err) {
     console.log(err);
@@ -48,7 +48,6 @@ Router.get("/me", Authetication, async (req, res) => {
 });
 Router.get("/GenerateQR", Authetication, async (req, res) => {
   try {
-    console.log(req.user._id, "req.user");
     const encrypted = encrypt(req.user._id);
 
     const signed = signData(encrypted);
@@ -56,7 +55,7 @@ Router.get("/GenerateQR", Authetication, async (req, res) => {
     const datatoEncode = encrypted + ":" + signed;
 
     const qrcode = await QRCode.toDataURL(datatoEncode);
-    console.log(qrcode);
+
     return res.send(qrcode);
   } catch (err) {
     console.log(err);
@@ -65,7 +64,7 @@ Router.get("/GenerateQR", Authetication, async (req, res) => {
 });
 Router.get("/getprofilepic/:id", Authetication, async (req, res) => {
   try {
-    console.log(req.params.id)
+    console.log(req.params.id);
     const user = await User.findById(req.params.id, { profilePic: 1 });
     if (!user) return res.status(400).send("User not found");
     res.send(user.profilePic);
@@ -135,7 +134,7 @@ Router.get("/:id", Authetication, async (req, res) => {
     const user = await User.findOne({ auth: req.params.id }).select(
       "-password"
     );
-    console.log(user);
+
     res.send(user);
   } catch (err) {
     console.log(err);
