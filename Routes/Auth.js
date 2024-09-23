@@ -5,6 +5,8 @@ const { securePassword, comparePassword } = require("../utils/Secure");
 const { generateAuthToken } = require("../utils/jwt");
 const mongoose = require("mongoose");
 const { User, validateUser } = require("../Model/User");
+const { Class, validateClass } = require("../Model/Class");
+const { Chatroom } = require("../Model/Chatrooms");
 
 Router.post("/register", async (req, res) => {
   const session = await mongoose.startSession();
@@ -41,6 +43,7 @@ Router.post("/register", async (req, res) => {
     const hashedPassword = securePassword(req.body.auth.password);
 
     // Create new Auth document
+    console.log("classRoom");
     auth = new Auth({
       email: req.body.auth.email,
       password: hashedPassword,
@@ -48,21 +51,36 @@ Router.post("/register", async (req, res) => {
     });
     await auth.save({ session });
 
+    const { error: classError } = validateClass(req.body.class);
+    if (classError) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).send(classError.details[0].message);
+    }
+
+    let classRoom = await Class.findOne(req.body.class).session(session);
+
+    if (!classRoom) {
+      classRoom = new Class(req.body.class);
+      await classRoom.save({ session });
+    }
+    console.log(classRoom, "classRoom is created");
+
     // Create new User document
     const user = new User({
       firstName: req.body.user.firstName,
       lastName: req.body.user.lastName,
       auth: auth._id,
+      Class: classRoom._id,
 
       gender: req.body.user.gender,
-      yearLevel: req.body.user.yearLevel,
-      department: req.body.user.department,
-      semister: req.body.user.semister,
 
       isMilitary: req.body.user.isMilitary,
     });
 
     await user.save({ session });
+
+    console.log(rooms, "rooms");
 
     // Commit transaction
     await session.commitTransaction();

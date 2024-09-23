@@ -2,23 +2,29 @@ const mongoose = require("mongoose");
 const joi = require("joi");
 
 const classSchema = new mongoose.Schema({
-  startDate: {
-    type: Date,
+  yearLevel: {
+    type: String,
     required: true,
-  },
-  year: {
-    type: String,
     enum: ["1", "2", "3", "4", "5"],
-    default: "1",
-  },
-  semester: {
-    type: String,
-    enum: ["1", "2"],
-    default: "1",
   },
   department: {
     type: String,
+    enum: [
+      "Computer Science",
+      "electronics",
+      "civil",
+      "Mechanical",
+      "Electrical",
+      "Aeronautical",
+      "Production",
+      "chemical",
+      "Motor Vehicles",
+    ],
+  },
+  semister: {
+    type: String,
     required: true,
+    enum: ["1", "2"],
   },
   date: {
     type: Date,
@@ -29,10 +35,21 @@ const classSchema = new mongoose.Schema({
 const Class = mongoose.model("Class", classSchema);
 
 const joischema = joi.object({
-  startDate: joi.date().required(),
-  year: joi.string().valid("1", "2", "3", "4", "5"),
-  semester: joi.string().valid("1", "2"),
-  department: joi.string().required(),
+  yearLevel: joi.string().required().valid("1", "2", "3", "4", "5"),
+  department: joi
+    .string()
+    .valid(
+      "Computer Science",
+      "electronics",
+      "civil",
+      "Mechanical",
+      "Electrical",
+      "Aeronautical",
+      "Production",
+      "chemical",
+      "Motor Vehicles"
+    ),
+  semister: joi.string().required().valid("1", "2"),
 });
 const validateClass = (classs) => {
   return joischema.validate(classs);

@@ -7,12 +7,20 @@ const Authetication = require("../MiddleWare/AuthMiddleware");
 const upload = require("../utils/multerConfig");
 const { signData, verifyData } = require("../utils/Signiture");
 const { encrypt, decrypt } = require("../utils/Crypto");
+const { Class } = require("../Model/Class");
 
 Router.post("/", Authetication, async (req, res) => {
   try {
     const { error } = validateUser(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     console.log("user registration");
+    console.log(req.body);
+    const classRoom = await Class.findOne({
+      department: req.body.department,
+      year: req.body.yearLevel,
+      semester: req.body.semister,
+    });
+    if (!classRoom) return res.status(400).send("Class not found");
 
     const user = new User({
       firstName: req.body.firstName,
