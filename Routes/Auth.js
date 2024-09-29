@@ -80,8 +80,6 @@ Router.post("/register", async (req, res) => {
 
     await user.save({ session });
 
-    console.log(rooms, "rooms");
-
     // Commit transaction
     await session.commitTransaction();
     session.endSession();

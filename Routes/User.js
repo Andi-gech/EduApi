@@ -108,7 +108,7 @@ Router.put(
   }
 );
 
-Router.post("/verifyQR", Authetication, async (req, res) => {
+Router.post("/verifyQR", async (req, res) => {
   try {
     const qrurl = req.body.qrurl;
 

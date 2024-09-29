@@ -8,10 +8,11 @@ const { roleAuth } = require("../MiddleWare/RoleAuth");
 Router.post(
   "/",
   AuthMiddleware,
-  roleAuth("student"),
+
   upload.single("Image"),
   async (req, res) => {
     try {
+      console.log(req.body);
       const { error } = validatePost(req.body);
       const uploadedFile = req.file;
       if (!uploadedFile) {
@@ -24,7 +25,7 @@ Router.post(
       if (error) return res.status(400).send(error.details[0].message);
       const post = new Post({
         content: req.body.content,
-        user: req.user.unique,
+        user: req.user.userid,
         image: req.body.image,
       });
       await post.save();

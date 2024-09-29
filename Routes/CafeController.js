@@ -4,7 +4,9 @@ const Router = express.Router();
 const Authetication = require("../MiddleWare/AuthMiddleware");
 const { roleAuth } = require("../MiddleWare/RoleAuth");
 const { CafeGate } = require("../Model/CafeGate");
-
+const { Auth, validateAuth } = require("../Model/Auth");
+const { signData, verifyData } = require("../utils/Signiture");
+const { encrypt, decrypt } = require("../utils/Crypto");
 Router.post(
   "/subscribe",
   Authetication,
@@ -100,122 +102,120 @@ Router.post("/subscribe/manual", Authetication, async (req, res) => {
 
   return res.send(subscriptions);
 });
-Router.get("/check/breakfast/:StudentId", async (req, res) => {
-  try {
-    // Check if the student has already checked in for breakfast
-    const existingCafe = await CafeGate.findOne({
-      user: req.params.StudentId,
-      Date: {
-        $gte: new Date(new Date().setHours(0, 0, 0)),
-        $lt: new Date(new Date().setHours(23, 59, 59)),
-      },
-    });
+const mealTimes = {
+  breakfast: { start: 6, end: 10 }, // Breakfast time range (6:00 AM - 10:00 AM)
+  lunch: { start: 12, end: 14 }, // Lunch time range (12:00 PM - 2:00 PM)
+  dinner: { start: 18, end: 20 }, // Dinner time range (6:00 PM - 8:00 PM)
+};
 
-    // If breakfast is already marked as true, return a 400 error
-    if (existingCafe && existingCafe.breakfast === true) {
+// Function to get current meal based on time
+const getCurrentMeal = () => {
+  const currentHour = new Date().getHours();
+
+  if (
+    currentHour >= mealTimes.breakfast.start &&
+    currentHour < mealTimes.breakfast.end
+  ) {
+    return "BreakFast";
+  } else if (
+    currentHour >= mealTimes.lunch.start &&
+    currentHour < mealTimes.lunch.end
+  ) {
+    return "Lunch";
+  } else if (
+    currentHour >= mealTimes.dinner.start &&
+    currentHour < mealTimes.dinner.end
+  ) {
+    return "Dinner";
+  }
+  return null; // No meal available for check-in outside of these times
+};
+
+Router.put("/check/meal/", async (req, res) => {
+  try {
+    const qrurl = req.body.qrurl;
+    if (!qrurl) {
+      return res.status(400).send("QR URL is required.");
+    }
+
+    // Extract encrypted data and signature from QR code
+    const data = qrurl.split(":");
+    if (data.length !== 3) {
+      return res.status(400).send("Invalid QR format.");
+    }
+
+    const encrypted = `${data[0]}:${data[1]}`;
+    const signed = data[2];
+
+    // Decrypt the encrypted data to get the student ID
+    const studentid = decrypt(encrypted);
+    if (!studentid) {
+      return res.status(400).send("Decryption failed.");
+    }
+
+    // Verify the signature to ensure data integrity
+    const verified = verifyData(encrypted, signed);
+    if (!verified) {
+      return res.status(400).send("Invalid QR code signature.");
+    }
+
+    // Find the student based on the decrypted ID
+    const student = await Auth.findById(studentid);
+    if (!student) {
+      return res.status(400).send("Student not found.");
+    }
+
+    // Determine the current meal time (breakfast, lunch, dinner)
+    const currentMeal = getCurrentMeal();
+    if (!currentMeal) {
       return res
         .status(400)
-        .send("Breakfast has already been checked for today.");
+        .send("It's not time for breakfast, lunch, or dinner.");
     }
 
-    // Otherwise, update or create the document with breakfast set to true
-    const cafe = await CafeGate.findOneAndUpdate(
-      {
-        user: req.params.StudentId,
-        Date: {
-          $gte: new Date(new Date().setHours(0, 0, 0)),
-          $lt: new Date(new Date().setHours(23, 59, 59)),
-        },
-      },
-      {
-        $set: {
-          breakfast: true,
-        },
-      },
-      { new: true, upsert: true }
-    );
-
-    return res.send(cafe);
-  } catch (err) {
-    res.status(500).send(err.message || "Something went wrong");
-  }
-});
-Router.get("/check/lunch/:StudentId", async (req, res) => {
-  try {
-    // Check if the student has already checked in for lunch
+    // Check if the student has already checked in for the current meal today
     const existingCafe = await CafeGate.findOne({
-      user: req.params.StudentId,
+      user: studentid,
       Date: {
-        $gte: new Date(new Date().setHours(0, 0, 0)),
-        $lt: new Date(new Date().setHours(23, 59, 59)),
+        $gte: new Date(new Date().setHours(0, 0, 0)), // Start of the day
+        $lt: new Date(new Date().setHours(23, 59, 59)), // End of the day
       },
     });
 
-    // If lunch is already marked as true, return a 400 error
-    if (existingCafe && existingCafe.lunch === true) {
-      return res.status(400).send("Lunch has already been checked for today.");
+    // If the student has already checked in for the current meal, return an error
+    if (existingCafe && existingCafe[currentMeal] === true) {
+      return res
+        .status(400)
+        .send(`${currentMeal} has already been checked for today.`);
     }
 
-    // Otherwise, update or create the document with lunch set to true
+    // Update or create the student's meal check-in for the current day
     const cafe = await CafeGate.findOneAndUpdate(
       {
-        user: req.params.StudentId,
+        user: studentid,
         Date: {
-          $gte: new Date(new Date().setHours(0, 0, 0)),
-          $lt: new Date(new Date().setHours(23, 59, 59)),
+          $gte: new Date(new Date().setHours(0, 0, 0)), // Start of the day
+          $lt: new Date(new Date().setHours(23, 59, 59)), // End of the day
         },
       },
       {
         $set: {
-          lunch: true,
+          [currentMeal]: true,
         },
       },
-      { new: true, upsert: true }
+      { new: true, upsert: true } // Create if doesn't exist
     );
 
+    // Return the updated or created meal check-in
     return res.send(cafe);
   } catch (err) {
-    res.status(500).send(err.message || "Something went wrong");
+    // Handle any unexpected errors
+    return res.status(500).send(err.message || "Something went wrong.");
   }
 });
-
-Router.get("/check/dinner/:StudentId", async (req, res) => {
-  try {
-    // Check if the student has already checked in for dinner
-    const existingCafe = await CafeGate.findOne({
-      user: req.params.StudentId,
-      Date: {
-        $gte: new Date(new Date().setHours(0, 0, 0)),
-        $lt: new Date(new Date().setHours(23, 59, 59)),
-      },
-    });
-
-    // If dinner is already marked as true, return a 400 error
-    if (existingCafe && existingCafe.dinner === true) {
-      return res.status(400).send("Dinner has already been checked for today.");
-    }
-
-    // Otherwise, update or create the document with dinner set to true
-    const cafe = await CafeGate.findOneAndUpdate(
-      {
-        user: req.params.StudentId,
-        Date: {
-          $gte: new Date(new Date().setHours(0, 0, 0)),
-          $lt: new Date(new Date().setHours(23, 59, 59)),
-        },
-      },
-      {
-        $set: {
-          dinner: true,
-        },
-      },
-      { new: true, upsert: true }
-    );
-
-    return res.send(cafe);
-  } catch (err) {
-    res.status(500).send(err.message || "Something went wrong");
-  }
+Router.get("/report", async (req, res) => {
+  const cafe = await CafeGate.find();
+  return res.send(cafe);
 });
 
 module.exports = Router;
