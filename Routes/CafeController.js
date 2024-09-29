@@ -207,7 +207,7 @@ Router.put("/check/meal/", async (req, res) => {
     );
 
     // Return the updated or created meal check-in
-    return res.send(cafe);
+    return res.send(`${currentMeal} checked for today.`);
   } catch (err) {
     // Handle any unexpected errors
     return res.status(500).send(err.message || "Something went wrong.");
