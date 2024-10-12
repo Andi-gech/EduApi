@@ -1,5 +1,6 @@
 const express = require("express");
 const { Cafe, validateCafe } = require("../Model/Cafe");
+const { User } = require("../Model/User");
 const Router = express.Router();
 const Authetication = require("../MiddleWare/AuthMiddleware");
 const { roleAuth } = require("../MiddleWare/RoleAuth");
@@ -15,7 +16,7 @@ Router.post(
     const { error } = validateCafe(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     const subs = await Cafe.findOne({
-      user: req.user._id,
+      user: req.userid,
       enddate: { $gt: Date.now() },
     });
     if (subs) return res.status(400).send("Already Subscribed");
@@ -25,7 +26,7 @@ Router.post(
     //   return res.status(400).send("Month Subscription not available");
     const cafe = new Cafe({
       location: req.body.location,
-      user: req.user._id,
+      user: req.userid,
     });
     await cafe.save();
     return res.send(cafe);
@@ -34,7 +35,7 @@ Router.post(
 Router.get("/subscription/status", Authetication, async (req, res) => {
   try {
     const cafe = await Cafe.findOne({
-      user: req.user._id,
+      user: req.userid,
       enddate: { $gt: Date.now() },
     });
     if (!cafe)
@@ -197,7 +198,9 @@ Router.put("/check/meal/", async (req, res) => {
     }
 
     // Find the student based on the decrypted ID
-    const student = await Auth.findById(studentid);
+    const student = await User.findOne({
+      auth: studentid,
+    });
     if (!student) {
       return res.status(400).send("Student not found.");
     }

@@ -11,7 +11,7 @@ const cafeSchema = new mongoose.Schema({
     
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Auth",
+        ref: "User",
   
         required: true
     },
