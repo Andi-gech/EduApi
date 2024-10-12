@@ -32,6 +32,16 @@ Router.post(
     return res.send(cafe);
   }
 );
+Router.delete("/unsubscribe/:id", async (req, res) => {
+  try {
+    const cafe = await Cafe.findByIdAndDelete(req.params.id);
+    if (!cafe) return res.status(400).send("Subscription not found");
+    return res.send(cafe);
+  } catch (err) {
+    res.status(500).send(err.message || "Something went wrong");
+  }
+});
+
 Router.get("/subscription/status", Authetication, async (req, res) => {
   try {
     const cafe = await Cafe.findOne({
