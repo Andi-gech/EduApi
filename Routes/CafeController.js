@@ -10,7 +10,7 @@ const { encrypt, decrypt } = require("../utils/Crypto");
 Router.post(
   "/subscribe",
   Authetication,
-  roleAuth("student"),
+
   async (req, res) => {
     const { error } = validateCafe(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -21,8 +21,8 @@ Router.post(
     if (subs) return res.status(400).send("Already Subscribed");
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
-    if (currentDay > 7)
-      return res.status(400).send("Month Subscription not available");
+    // if (currentDay > 29)
+    //   return res.status(400).send("Month Subscription not available");
     const cafe = new Cafe({
       location: req.body.location,
       user: req.user._id,
@@ -102,7 +102,6 @@ Router.post("/subscribe/manual", Authetication, async (req, res) => {
     const cafe = new Cafe({
       location: req.body.location,
       user: userId,
-      startdate: req.body.startdate,
     });
     await cafe.save();
     subscriptions.push(cafe);

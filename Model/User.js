@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     ref: "Auth",
     required: true,
   },
+  studentid: {
+    type: String,
+    required: true,
+  },
   dob: {
     type: Date,
   },
@@ -72,6 +76,7 @@ const validateUser = (user) => {
     dob: Joi.date().optional(),
     gender: Joi.string().valid("Male", "Female").required(),
     phone: Joi.number().optional(),
+    studentid: Joi.string().required(),
 
     isMilitary: Joi.boolean().default(false),
     Enrollment: Joi.array().items(Joi.string()).optional(),

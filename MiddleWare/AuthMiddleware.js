@@ -2,6 +2,7 @@ const { User } = require("../Model/User");
 const { verifyAuthToken } = require("../utils/jwt");
 
 module.exports = async (req, res, next) => {
+  console.log("dats");
   const token = req.headers["authorization"];
 
   if (!token) return res.status(401).send("Access denied. No token provided.");
@@ -13,6 +14,7 @@ module.exports = async (req, res, next) => {
     console.log("user", decoded);
 
     req.user = decoded;
+    console.log("finished");
 
     next();
   } catch (err) {

@@ -28,6 +28,7 @@ Router.post("/", Authetication, async (req, res) => {
       auth: req.body.auth,
 
       gender: req.body.gender,
+      studentid: req.body.studentid,
 
       yearLevel: req.body.yearLevel,
       department: req.body.department,
@@ -146,6 +147,14 @@ Router.get("/:id", Authetication, async (req, res) => {
     res.send(user);
   } catch (err) {
     console.log(err);
+    res.send(err.message);
+  }
+});
+Router.get("/", async (req, res) => {
+  try {
+    const user = await User.find();
+    res.send(user);
+  } catch (err) {
     res.send(err.message);
   }
 });
