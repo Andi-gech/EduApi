@@ -85,7 +85,7 @@ Router.get("/subscriptions/report", async (req, res) => {
     res.status(500).send(err.message || "Something went wrong");
   }
 });
-Router.post("/subscribe/manual", Authetication, async (req, res) => {
+Router.post("/subscribe/manual", async (req, res) => {
   const { error } = validateCafe(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
