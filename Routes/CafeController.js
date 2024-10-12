@@ -86,7 +86,6 @@ Router.get("/subscriptions/report", async (req, res) => {
   }
 });
 Router.post("/subscribe/manual", async (req, res) => {
-  const { error } = validateCafe(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let usersToSubscribe = [];
