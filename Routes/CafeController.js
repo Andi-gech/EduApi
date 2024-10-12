@@ -86,26 +86,59 @@ Router.get("/subscriptions/report", async (req, res) => {
   }
 });
 Router.post("/subscribe/manual", async (req, res) => {
-  let usersToSubscribe = [];
+  const session = await Cafe.startSession(); // Start a session for transaction
+  session.startTransaction(); // Begin transaction
 
-  if (Array.isArray(req.body.users)) {
-    usersToSubscribe = req.body.users;
-  } else {
-    usersToSubscribe.push(req.body.users);
+  try {
+    let usersToSubscribe = [];
+
+    if (Array.isArray(req.body.users)) {
+      usersToSubscribe = req.body.users;
+    } else {
+      usersToSubscribe.push(req.body.users);
+    }
+
+    const subscriptions = [];
+
+    for (let userId of usersToSubscribe) {
+      // Check if the user is already subscribed
+      const subs = await Cafe.findOne({
+        user: userId,
+        enddate: { $gt: Date.now() },
+      }).session(session); // Add session to ensure transaction scope
+
+      if (subs) {
+        // Abort transaction if any user is already subscribed
+        await session.abortTransaction();
+        session.endSession();
+        return res
+          .status(400)
+          .send("User " + userId + " is already subscribed");
+      }
+
+      // Create a new subscription if not already subscribed
+      const cafe = new Cafe({
+        location: req.body.location,
+        user: userId,
+      });
+
+      await cafe.save({ session }); // Save within transaction
+      subscriptions.push(cafe);
+    }
+
+    // Commit the transaction after successful operations
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.send(subscriptions);
+  } catch (err) {
+    // Abort the transaction and return error in case of any issue
+    await session.abortTransaction();
+    session.endSession();
+    return res.status(500).send("Subscription failed: " + err.message);
   }
-
-  const subscriptions = [];
-  for (let userId of usersToSubscribe) {
-    const cafe = new Cafe({
-      location: req.body.location,
-      user: userId,
-    });
-    await cafe.save();
-    subscriptions.push(cafe);
-  }
-
-  return res.send(subscriptions);
 });
+
 const mealTimes = {
   breakfast: { start: 6, end: 10 }, // Breakfast time range (6:00 AM - 10:00 AM)
   lunch: { start: 12, end: 14 }, // Lunch time range (12:00 PM - 2:00 PM)
