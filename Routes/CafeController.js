@@ -79,7 +79,7 @@ Router.get("/subscriptions", Authetication, async (req, res) => {
 });
 Router.get("/subscriptions/report", async (req, res) => {
   try {
-    const cafes = await Cafe.find();
+    const cafes = await Cafe.find().populate("user");
     return res.send(cafes);
   } catch (err) {
     res.status(500).send(err.message || "Something went wrong");
@@ -251,7 +251,7 @@ Router.put("/check/meal/", async (req, res) => {
   }
 });
 Router.get("/report", async (req, res) => {
-  const cafe = await CafeGate.find();
+  const cafe = await CafeGate.find().populate("user");
   return res.send(cafe);
 });
 
