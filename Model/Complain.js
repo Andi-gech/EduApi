@@ -11,6 +11,11 @@ const complainSchema = new mongoose.Schema({
     enum: ["dormitary", "class", "admin", "security", "other"],
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["pending", "resolved", "rejected"],
+    default: "pending",
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

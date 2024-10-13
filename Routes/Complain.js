@@ -22,7 +22,10 @@ Router.post("/", Authetication, roleAuth("student"), async (req, res) => {
 });
 Router.get("/", async (req, res) => {
   try {
-    const complain = await Complain.find();
+    const complain = await Complain.find().populate(
+      "user",
+      "firstName lastName"
+    );
     return res.send(complain);
   } catch (error) {
     return res.status(500).send;
