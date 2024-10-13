@@ -16,7 +16,7 @@ Router.post(
     const { error } = validateCafe(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     const subs = await Cafe.findOne({
-      user: req.userid,
+      user: req.user.userid,
       enddate: { $gt: Date.now() },
     });
     if (subs) return res.status(400).send("Already Subscribed");
@@ -26,7 +26,7 @@ Router.post(
     //   return res.status(400).send("Month Subscription not available");
     const cafe = new Cafe({
       location: req.body.location,
-      user: req.userid,
+      user: req.user.userid,
     });
     await cafe.save();
     return res.send(cafe);
@@ -45,7 +45,7 @@ Router.delete("/unsubscribe/:id", async (req, res) => {
 Router.get("/subscription/status", Authetication, async (req, res) => {
   try {
     const cafe = await Cafe.findOne({
-      user: req.userid,
+      user: req.user.userid,
       enddate: { $gt: Date.now() },
     });
     if (!cafe)

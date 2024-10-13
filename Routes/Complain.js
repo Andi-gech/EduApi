@@ -12,7 +12,7 @@ Router.post("/", Authetication, roleAuth("student"), async (req, res) => {
     const complain = new Complain({
       complain: req.body.complain,
       type: req.body.type,
-      user: req.user._id,
+      user: req.user.userid,
     });
     await complain.save();
     return res.send(complain);
