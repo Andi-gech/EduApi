@@ -109,7 +109,7 @@ Router.post("/register", async (req, res) => {
     await session.abortTransaction();
 
     session.endSession();
-    res.status(500).send("Something went wrong.");
+    res.status(500).send(err.message);
   }
 });
 Router.post("/login", async (req, res) => {
