@@ -72,6 +72,7 @@ Router.post("/register", async (req, res) => {
       lastName: req.body.user.lastName,
       auth: auth._id,
       Class: classRoom._id,
+      studentid: req.body.user.studentid,
 
       gender: req.body.user.gender,
 
