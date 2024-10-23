@@ -138,11 +138,9 @@ Router.post("/verifyQR", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-Router.get("/:id", Authetication, async (req, res) => {
+Router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findOne({ auth: req.params.id }).select(
-      "-password"
-    );
+    const user = await User.findOne().select("-password");
 
     res.send(user);
   } catch (err) {
