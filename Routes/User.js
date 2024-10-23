@@ -140,7 +140,7 @@ Router.post("/verifyQR", async (req, res) => {
 });
 Router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findOne().select("-password");
+    const user = await User.findById(req.params.id);
 
     res.send(user);
   } catch (err) {
