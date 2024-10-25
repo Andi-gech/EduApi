@@ -14,7 +14,7 @@ const { Chat } = require("../Model/Chat");
  *     description: Retrieves all chat rooms associated with the authenticated user based on their ID.
  *     tags: [Chatrooms]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     responses:
  *       200:
  *         description: List of chat rooms for the user
@@ -57,7 +57,7 @@ Router.get("/", AuthMiddleware, EnsureChatrooms, async (req, res) => {
  *     description: Retrieves a list of all unique chat room names.
  *     tags: [Chatrooms]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     responses:
  *       200:
  *         description: List of distinct chat room names
@@ -86,7 +86,7 @@ Router.get("/room", AuthMiddleware, async (req, res) => {
  *     description: Allows an authenticated user to create a new chat room.
  *     tags: [Chatrooms]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -139,7 +139,7 @@ Router.post("/", AuthMiddleware, async (req, res) => {
  *     description: Retrieves the last 20 messages from a specified chat room along with sender details.
  *     tags: [Chatrooms]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     parameters:
  *       - in: path
  *         name: name

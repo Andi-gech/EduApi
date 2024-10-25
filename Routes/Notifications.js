@@ -13,7 +13,7 @@ const { User } = require("../Model/User");
  *     description: Fetches notifications for the authenticated student user.
  *     tags: [Notifications]
  *     security:
- *       - bearerAuth: []  # Assuming you're using bearer token authentication
+ *       - tokenAuth: []  # Assuming you're using bearer token authentication
  *     responses:
  *       200:
  *         description: A list of notifications for the student.

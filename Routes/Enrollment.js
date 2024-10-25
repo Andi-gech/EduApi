@@ -14,7 +14,7 @@ const Authetication = require("../MiddleWare/AuthMiddleware");
  *     description: Retrieves the user's current course enrollments based on their class year level and semester.
  *     tags: [Enrollments]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     responses:
  *       200:
  *         description: User's current course enrollments.
@@ -92,7 +92,7 @@ Router.get("/currentEnrollment", Authetication, async (req, res) => {
  *     description: Allows an authenticated user to enroll in a course for the current year and semester.
  *     tags: [Enrollments]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -177,7 +177,7 @@ Router.post("/enroll", Authetication, async (req, res) => {
  *     description: Returns the available course offerings based on the user's class information.
  *     tags: [Course Offerings]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     responses:
  *       200:
  *         description: Successfully retrieved course offerings.
@@ -260,7 +260,7 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *     description: Returns the schedule for courses offered to the user based on their class information, grouped by day.
  *     tags: [Schedule]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     responses:
  *       200:
  *         description: Successfully retrieved the schedule.

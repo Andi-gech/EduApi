@@ -17,7 +17,7 @@ const { Notifications } = require("../Model/Notifications");
  *     description: This endpoint allows a student to create a new permission request. If a permission request already exists for the given date, an error message will be returned.
  *     tags: [Permissions]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -110,7 +110,7 @@ Router.post("/", AuthMiddleware, roleAuth("student"), async (req, res) => {
  *     description: This endpoint allows a student to retrieve their permission request history. It returns all permission requests associated with the authenticated user.
  *     tags: [Permissions]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     responses:
  *       200:
  *         description: Successful retrieval of permission history.
@@ -172,7 +172,7 @@ Router.get(
  *     description: This endpoint allows authenticated users to retrieve permissions that have a status of "pending" and are scheduled to occur within the next 24 hours.
  *     tags: [Permissions]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     responses:
  *       200:
  *         description: Successful retrieval of pending permissions.
@@ -236,7 +236,7 @@ Router.get("/new", AuthMiddleware, async (req, res) => {
  *     description: This endpoint allows authenticated users to retrieve a list of all permission requests.
  *     tags: [Permissions]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     responses:
  *       200:
  *         description: Successful retrieval of all permissions.
@@ -294,7 +294,7 @@ Router.get("/all", AuthMiddleware, async (req, res) => {
  *     description: This endpoint allows authenticated users to approve a permission request by its ID. A notification is sent to the user upon approval.
  *     tags: [Permissions]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     parameters:
  *       - in: path
  *         name: id
@@ -391,7 +391,7 @@ Router.put("/approve/:id", AuthMiddleware, async (req, res) => {
  *     description: This endpoint allows authenticated users with the "StudentOfficer" role to reject a permission request by its ID.
  *     tags: [Permissions]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     parameters:
  *       - in: path
  *         name: id

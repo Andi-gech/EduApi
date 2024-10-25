@@ -13,7 +13,7 @@ const upload = require("../utils/multerConfig");
  *     description: Returns a list of all course resources populated with their associated course details. This endpoint requires authentication.
  *     tags: [Course Resources]
  *     security:
- *       - bearerAuth: []  # Specify your authentication method, like bearer token
+ *       - tokenAuth: []  # Specify your authentication method, like bearer token
  *     responses:
  *       200:
  *         description: A list of course resources
@@ -77,7 +77,7 @@ Router.get("/", Authetication, async (req, res) => {
  *     description: Uploads a new resource for a specific course. Requires authentication and a file upload. The file is sent in the request body under the key "resource".
  *     tags: [Course Resources]
  *     security:
- *       - bearerAuth: []  # Specify your authentication method, like bearer token
+ *       - tokenAuth: []  # Specify your authentication method, like bearer token
  *     parameters:
  *       - name: courseid
  *         in: path

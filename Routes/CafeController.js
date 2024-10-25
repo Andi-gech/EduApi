@@ -16,7 +16,7 @@ const { encrypt, decrypt } = require("../utils/Crypto");
  *     description: Allows a user to subscribe to a cafe service.
  *     tags: [Cafe]
  *     security:
- *       - bearerAuth: []  # Specify the authentication type used in your application
+ *       - tokenAuth: []  # Specify the authentication type used in your application
  *     requestBody:
  *       required: true
  *       content:
@@ -103,7 +103,7 @@ Router.post(
  *     description: Allows a user to unsubscribe from a cafe service by its ID.
  *     tags: [Cafe]
  *     security:
- *       - bearerAuth: []  # Specify the authentication type used in your application
+ *       - tokenAuth: []  # Specify the authentication type used in your application
  *     parameters:
  *       - name: id
  *         in: path
@@ -172,7 +172,7 @@ Router.delete("/unsubscribe/:id", async (req, res) => {
  *     description: Retrieves the current subscription status for the authenticated user.
  *     tags: [Cafe]
  *     security:
- *       - bearerAuth: []  # Specify the authentication type used in your application
+ *       - tokenAuth: []  # Specify the authentication type used in your application
  *     responses:
  *       200:
  *         description: Successful retrieval of subscription status
@@ -223,7 +223,7 @@ Router.get("/subscription/status", Authetication, async (req, res) => {
  *     description: Fetches all subscriptions for the authenticated user within the specified month and year.
  *     tags: [Cafe]
  *     security:
- *       - bearerAuth: []  # Specify the authentication type used in your application
+ *       - tokenAuth: []  # Specify the authentication type used in your application
  *     parameters:
  *       - name: month
  *         in: query

@@ -105,7 +105,7 @@ Router.post(
  *     description: This endpoint retrieves posts that the authenticated user has not viewed. It excludes any posts the user has already seen and returns them sorted by date in descending order.
  *     tags: [Posts]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     responses:
  *       200:
  *         description: A list of posts not viewed by the user.
@@ -170,7 +170,7 @@ Router.get("/", AuthMiddleware, async (req, res) => {
  *     description: This endpoint allows authenticated users to mark a post as viewed. Users can only view a post once.
  *     tags: [Posts]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     parameters:
  *       - in: path
  *         name: id
@@ -244,7 +244,7 @@ Router.put("/viewer/:id", AuthMiddleware, async (req, res) => {
  *     description: This endpoint allows an authenticated user to like a specific post. If the user has already liked the post, an error message will be returned.
  *     tags: [Posts]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     parameters:
  *       - name: id
  *         in: path
@@ -331,7 +331,7 @@ Router.put("/like/:id", AuthMiddleware, async (req, res) => {
  *     description: This endpoint allows an authenticated user to unlike a specific post. If the user has not liked the post yet, an error message will be returned.
  *     tags: [Posts]
  *     security:
- *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *       - tokenAuth: []  # Assuming you're using Bearer token for authentication
  *     parameters:
  *       - name: id
  *         in: path

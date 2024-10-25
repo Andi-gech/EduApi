@@ -12,7 +12,7 @@ const { roleAuth } = require("../MiddleWare/RoleAuth");
  *     description: Allows a student to submit a complaint with a specified type.
  *     tags: [Complain]
  *     security:
- *       - bearerAuth: []
+ *       - tokenAuth: []
  *     requestBody:
  *       required: true
  *       content:
