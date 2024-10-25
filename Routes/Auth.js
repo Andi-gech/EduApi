@@ -7,7 +7,90 @@ const mongoose = require("mongoose");
 const { User, validateUser } = require("../Model/User");
 const { Class, validateClass } = require("../Model/Class");
 const { Chatroom } = require("../Model/Chatrooms");
+const swagger = require("../utils/swagger");
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Auth:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *         password:
+ *           type: string
+ *           minLength: 6
+ *           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$"
+ *         Role:
+ *           type: string
+ *           enum: ["systemadmin", "teacher", "student", "library", "StudentOfficer", "AcademicOfficer", "Cafe", "HumanResource", "WardControll"]
+ *       required:
+ *         - email
+ *         - password
+ *         - Role
+ *     User:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
+ *         studentid:
+ *           type: string
+ *         gender:
+ *           type: string
+ *         isMilitary:
+ *           type: boolean
+ *         auth:
+ *           type: string
+ *         Class:
+ *           type: string
+ *     Class:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         description:
+ *           type: string
+ */
+
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               auth:
+ *                 $ref: '#/components/schemas/Auth'
+ *               user:
+ *                 $ref: '#/components/schemas/User'
+ *               class:
+ *                 $ref: '#/components/schemas/Class'
+ *     responses:
+ *       200:
+ *         description: User successfully registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Internal server error
+ */
 Router.post("/register", async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -113,6 +196,77 @@ Router.post("/register", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login a user and return a JWT token on successful authentication.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       description: User login credentials.
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: User's email address.
+ *                 example: "andi@gmail.com"
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *                 pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$"
+ *                 description: User's password.
+ *                 example: "10987126@Ndi"
+ *             required:
+ *               - email
+ *               - password
+ *     responses:
+ *       200:
+ *         description: User successfully logged in.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for authorization.
+ *                 isapproved:
+ *                   type: boolean
+ *                   description: Indicates if the user is approved.
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       description: Unique identifier for the authenticated user.
+ *                     email:
+ *                       type: string
+ *                       description: Email of the authenticated user.
+ *                     userid:
+ *                       type: string
+ *                       description: Profile ID associated with the authenticated user.
+ *       400:
+ *         description: Invalid email or password.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Invalid email or password"
+ *       500:
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Internal server error"
+ */
+
 Router.post("/login", async (req, res) => {
   try {
     const { error } = validateAuth(req.body);

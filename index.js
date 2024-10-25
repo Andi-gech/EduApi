@@ -19,6 +19,7 @@ const notification = require("./Routes/Notifications");
 
 const connect = require("./Connect");
 const cors = require("cors");
+require("./utils/swagger")(app);
 app.use(express.static("uploads"));
 app.use("/uploads", express.static("uploads"));
 app.use(cors());

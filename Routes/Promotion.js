@@ -6,6 +6,35 @@ const mongoose = require("mongoose");
 const Router = express.Router();
 const Years = ["1", "2", "3", "4", "5"];
 
+/**
+ * @swagger
+ * /promote:
+ *   post:
+ *     summary: Promote students to the next academic year or semester
+ *     description: This endpoint promotes students by updating their semester and year level. If a student's semester is 2, their year level is incremented. If the semester is 1, it is incremented to 2. Requires appropriate permissions.
+ *     tags: [Promotion]
+ *     responses:
+ *       200:
+ *         description: Users promoted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Users promoted successfully."
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal server error."
+ */
 Router.post("/promote", async (req, res) => {
   try {
     const session = await mongoose.startSession();
@@ -17,7 +46,6 @@ Router.post("/promote", async (req, res) => {
     const updatedclass = classToUpdate.map(async (classroom) => {
       console.log("classroom semester is ", classroom.semister);
       if (classroom.semister === "2") {
-        // Increase the year if the semester is 2
         console.log("classroom semester is ", classroom.semister);
         if (Years.indexOf(classroom.yearLevel) !== Years.length - 1) {
           classroom.yearLevel = Years[Years.indexOf(classroom.yearLevel) + 1];

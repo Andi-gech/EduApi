@@ -9,6 +9,75 @@ const mongoose = require("mongoose");
 const { getIo } = require("./Chat");
 const { Notifications } = require("../Model/Notifications");
 
+/**
+ * @swagger
+ * /permission/:
+ *   post:
+ *     summary: Create a new permission request
+ *     description: This endpoint allows a student to create a new permission request. If a permission request already exists for the given date, an error message will be returned.
+ *     tags: [Permissions]
+ *     security:
+ *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Reason:
+ *                 type: string
+ *                 example: "I need permission to attend a family event."
+ *               permissionDate:
+ *                 type: string
+ *                 format: date
+ *                 example: "2023-11-15"
+ *     responses:
+ *       200:
+ *         description: Permission request created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: "60c72b2f9b1e8c001f8d4b58"
+ *                 Reason:
+ *                   type: string
+ *                   example: "I need permission to attend a family event."
+ *                 user:
+ *                   type: string
+ *                   example: "60c72b2f9b1e8c001f8d4b57"
+ *                 permissionDate:
+ *                   type: string
+ *                   format: date
+ *                   example: "2023-11-15"
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-10-25T12:00:00.000Z"
+ *       400:
+ *         description: Invalid request, permission already exists, or validation error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Permission already created check For Approval in History"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Something went wrong."
+ */
 Router.post("/", AuthMiddleware, roleAuth("student"), async (req, res) => {
   try {
     const { error } = validatePermission(req.body);
@@ -33,6 +102,53 @@ Router.post("/", AuthMiddleware, roleAuth("student"), async (req, res) => {
     res.status(500).send(err.message || "Something went wrong");
   }
 });
+/**
+ * @swagger
+ * /History:
+ *   get:
+ *     summary: Retrieve permission history for a student
+ *     description: This endpoint allows a student to retrieve their permission request history. It returns all permission requests associated with the authenticated user.
+ *     tags: [Permissions]
+ *     security:
+ *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *     responses:
+ *       200:
+ *         description: Successful retrieval of permission history.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: "60c72b2f9b1e8c001f8d4b58"
+ *                   Reason:
+ *                     type: string
+ *                     example: "I need permission to attend a family event."
+ *                   user:
+ *                     type: string
+ *                     example: "60c72b2f9b1e8c001f8d4b57"
+ *                   permissionDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2023-11-15"
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2023-10-25T12:00:00.000Z"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Something went wrong."
+ */
 Router.get(
   "/History",
   AuthMiddleware,
@@ -48,6 +164,56 @@ Router.get(
     }
   }
 );
+/**
+ * @swagger
+ * /new:
+ *   get:
+ *     summary: Retrieve pending permissions for the next 24 hours
+ *     description: This endpoint allows authenticated users to retrieve permissions that have a status of "pending" and are scheduled to occur within the next 24 hours.
+ *     tags: [Permissions]
+ *     security:
+ *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *     responses:
+ *       200:
+ *         description: Successful retrieval of pending permissions.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: "60c72b2f9b1e8c001f8d4b58"
+ *                   Reason:
+ *                     type: string
+ *                     example: "Requesting permission to attend an event."
+ *                   user:
+ *                     type: string
+ *                     example: "60c72b2f9b1e8c001f8d4b57"
+ *                   permissionDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2023-10-26"
+ *                   status:
+ *                     type: string
+ *                     example: "pending"
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2023-10-25T12:00:00.000Z"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Something went wrong."
+ */
 Router.get("/new", AuthMiddleware, async (req, res) => {
   try {
     const permissions = await Permission.find({
@@ -62,6 +228,56 @@ Router.get("/new", AuthMiddleware, async (req, res) => {
     res.status(500).send(err.message || "Something went wrong");
   }
 });
+/**
+ * @swagger
+ * /all:
+ *   get:
+ *     summary: Retrieve all permissions
+ *     description: This endpoint allows authenticated users to retrieve a list of all permission requests.
+ *     tags: [Permissions]
+ *     security:
+ *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *     responses:
+ *       200:
+ *         description: Successful retrieval of all permissions.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: "60c72b2f9b1e8c001f8d4b58"
+ *                   Reason:
+ *                     type: string
+ *                     example: "Requesting permission to attend an event."
+ *                   user:
+ *                     type: string
+ *                     example: "60c72b2f9b1e8c001f8d4b57"
+ *                   permissionDate:
+ *                     type: string
+ *                     format: date
+ *                     example: "2023-10-26"
+ *                   status:
+ *                     type: string
+ *                     example: "approved"
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2023-10-25T12:00:00.000Z"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Something went wrong."
+ */
 Router.get("/all", AuthMiddleware, async (req, res) => {
   try {
     const permissions = await Permission.find();
@@ -70,6 +286,75 @@ Router.get("/all", AuthMiddleware, async (req, res) => {
     res.status(500).send(err.message || "Something went wrong");
   }
 });
+/**
+ * @swagger
+ * /approve/{id}:
+ *   put:
+ *     summary: Approve a permission request
+ *     description: This endpoint allows authenticated users to approve a permission request by its ID. A notification is sent to the user upon approval.
+ *     tags: [Permissions]
+ *     security:
+ *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the permission request to approve.
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9b1e8c001f8d4b58"
+ *     responses:
+ *       200:
+ *         description: Permission approved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: "60c72b2f9b1e8c001f8d4b58"
+ *                 Reason:
+ *                   type: string
+ *                   example: "Requesting permission to attend an event."
+ *                 user:
+ *                   type: string
+ *                   example: "60c72b2f9b1e8c001f8d4b57"
+ *                 permissionDate:
+ *                   type: string
+ *                   format: date
+ *                   example: "2023-10-26"
+ *                 status:
+ *                   type: string
+ *                   example: "approved"
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-10-25T12:00:00.000Z"
+ *       400:
+ *         description: Invalid ID or permission not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   enum:
+ *                     - "Invalid id"
+ *                     - "Permission not found"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Something went wrong."
+ */
+
 Router.put("/approve/:id", AuthMiddleware, async (req, res) => {
   try {
     const { io, userSocketMap } = getIo();
@@ -98,6 +383,75 @@ Router.put("/approve/:id", AuthMiddleware, async (req, res) => {
     return res.status(500).send(err.message || "Something went wrong");
   }
 });
+/**
+ * @swagger
+ * /reject/{id}:
+ *   put:
+ *     summary: Reject a permission request
+ *     description: This endpoint allows authenticated users with the "StudentOfficer" role to reject a permission request by its ID.
+ *     tags: [Permissions]
+ *     security:
+ *       - bearerAuth: []  # Assuming you're using Bearer token for authentication
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the permission request to reject.
+ *         schema:
+ *           type: string
+ *           example: "60c72b2f9b1e8c001f8d4b58"
+ *     responses:
+ *       200:
+ *         description: Permission rejected successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: "60c72b2f9b1e8c001f8d4b58"
+ *                 Reason:
+ *                   type: string
+ *                   example: "Requesting permission to attend an event."
+ *                 user:
+ *                   type: string
+ *                   example: "60c72b2f9b1e8c001f8d4b57"
+ *                 permissionDate:
+ *                   type: string
+ *                   format: date
+ *                   example: "2023-10-26"
+ *                 status:
+ *                   type: string
+ *                   example: "denied"
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-10-25T12:00:00.000Z"
+ *       400:
+ *         description: Invalid ID or permission not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   enum:                 # Use enum to specify multiple possible values
+ *                     - "Invalid id"
+ *                     - "Permission not found"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Something went wrong."
+ */
+
 Router.put(
   "/reject/:id",
   AuthMiddleware,
