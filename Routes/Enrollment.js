@@ -8,7 +8,7 @@ const Authetication = require("../MiddleWare/AuthMiddleware");
 
 /**
  * @swagger
- * /currentEnrollment:
+ * /enrollment/currentEnrollment:
  *   get:
  *     summary: Get current enrollment information for the user
  *     description: Retrieves the user's current course enrollments based on their class year level and semester.
@@ -86,7 +86,7 @@ Router.get("/currentEnrollment", Authetication, async (req, res) => {
 });
 /**
  * @swagger
- * /enroll:
+ * /enrollment/enroll:
  *   post:
  *     summary: Enroll a user in a course
  *     description: Allows an authenticated user to enroll in a course for the current year and semester.
@@ -171,7 +171,7 @@ Router.post("/enroll", Authetication, async (req, res) => {
 });
 /**
  * @swagger
- * /GetMyoffering:
+ * /enrollment/GetMyoffering:
  *   get:
  *     summary: Retrieve course offerings for the current user
  *     description: Returns the available course offerings based on the user's class information.
@@ -254,7 +254,7 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
 });
 /**
  * @swagger
- * /GetSchedule:
+ * /enrollment/GetSchedule:
  *   get:
  *     summary: Retrieve the class schedule for the current user
  *     description: Returns the schedule for courses offered to the user based on their class information, grouped by day.
@@ -350,7 +350,7 @@ Router.get("/GetSchedule", Authetication, async (req, res) => {
 });
 /**
  * @swagger
- * /assignCourse:
+ * /enrollment/assignCourse:
  *   post:
  *     summary: Assign courses to a department for a specific year level and semester
  *     description: Assigns a set of courses to a given department, year level, and semester, preventing duplicate assignments.
@@ -432,7 +432,7 @@ Router.post("/assignCourse", async (req, res) => {
 });
 /**
  * @swagger
- * /CreateCourse:
+ * /enrollment/CreateCourse:
  *   post:
  *     summary: Create a new course
  *     description: This endpoint allows users to create a new course by providing the course details.

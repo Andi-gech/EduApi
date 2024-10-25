@@ -6,7 +6,7 @@ const Authetication = require("../MiddleWare/AuthMiddleware");
 const { roleAuth } = require("../MiddleWare/RoleAuth");
 /**
  * @swagger
- * /complains:
+ * /complain:
  *   post:
  *     summary: Submit a new complaint
  *     description: Allows a student to submit a complaint with a specified type.
@@ -78,7 +78,7 @@ Router.post("/", Authetication, roleAuth("student"), async (req, res) => {
 });
 /**
  * @swagger
- * /complains/:
+ * /complain/:
  *   get:
  *     summary: Retrieve all complaints
  *     description: Returns a list of all complaints with user details (first and last name).
@@ -137,7 +137,7 @@ Router.get("/", async (req, res) => {
 });
 /**
  * @swagger
- * /complains/{id}:
+ * /complain/{id}:
  *   delete:
  *     summary: Delete a specific complaint
  *     description: Deletes a complaint by its ID.

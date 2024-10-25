@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const port = 3000;
 const User = require("./Routes/User");
 const Auth = require("./Routes/Auth");
@@ -20,6 +21,7 @@ const notification = require("./Routes/Notifications");
 const connect = require("./Connect");
 const cors = require("cors");
 require("./utils/swagger")(app);
+app.use("/public", express.static(path.join(__dirname, "public")));
 app.use(express.static("uploads"));
 app.use("/uploads", express.static("uploads"));
 app.use(cors());
