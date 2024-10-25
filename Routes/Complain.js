@@ -10,7 +10,7 @@ const { roleAuth } = require("../MiddleWare/RoleAuth");
  *   post:
  *     summary: Submit a new complaint
  *     description: Allows a student to submit a complaint with a specified type.
- *     tags: [Complaints]
+ *     tags: [Complain]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -82,7 +82,7 @@ Router.post("/", Authetication, roleAuth("student"), async (req, res) => {
  *   get:
  *     summary: Retrieve all complaints
  *     description: Returns a list of all complaints with user details (first and last name).
- *     tags: [Complaints]
+ *     tags: [Complain]
  *     responses:
  *       200:
  *         description: List of complaints retrieved successfully.
@@ -141,7 +141,7 @@ Router.get("/", async (req, res) => {
  *   delete:
  *     summary: Delete a specific complaint
  *     description: Deletes a complaint by its ID.
- *     tags: [Complaints]
+ *     tags: [Complain]
  *     parameters:
  *       - in: path
  *         name: id
