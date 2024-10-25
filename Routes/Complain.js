@@ -61,7 +61,7 @@ const { roleAuth } = require("../MiddleWare/RoleAuth");
  *       500:
  *         description: Internal server error
  */
-Router.post("/", Authetication, roleAuth("student"), async (req, res) => {
+Router.post("/", Authetication, async (req, res) => {
   try {
     const { error } = validateComplain(req.body);
     if (error) return res.status(400).send(error.details[0].message);
