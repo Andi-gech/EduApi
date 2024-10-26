@@ -299,8 +299,6 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *     summary: Retrieve course offerings
  *     description: Get the list of course offerings based on the specified department, year level, and semester.
  *     tags: [Course Offering]
- *     security:
- *       - bearerAuth: []  # Assuming you're using bearer token authentication
  *     parameters:
  *       - in: body
  *         name: body
@@ -350,7 +348,7 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *       500:
  *         description: Internal server error. An error occurred while processing the request.
  */
-Router.get("/Getoffering", Authetication, async (req, res) => {
+Router.get("/Getoffering", async (req, res) => {
   try {
     const offerdCourse = await CourseOffering.findOne({
       department: req.body.department,
