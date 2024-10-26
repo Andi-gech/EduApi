@@ -294,6 +294,81 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
 });
 /**
  * @swagger
+ * /enrollment/Getoffering:
+ *   get:
+ *     summary: Retrieve course offerings
+ *     description: Get the list of course offerings based on the specified department, year level, and semester.
+ *     tags: [Course Offering]
+ *     security:
+ *       - bearerAuth: []  # Assuming you're using bearer token authentication
+ *     parameters:
+ *       - in: body
+ *         name: body
+ *         description: Department, year level, and semester to filter the course offerings.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             department:
+ *               type: string
+ *               description: The department to filter course offerings.
+ *             yearLevel:
+ *               type: integer
+ *               description: The year level to filter course offerings.
+ *             semister:
+ *               type: string
+ *               description: The semester to filter course offerings (e.g., "Fall", "Spring").
+ *     responses:
+ *       200:
+ *         description: A course offering object containing the details of the courses offered.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             department:
+ *               type: string
+ *             yearLevel:
+ *               type: integer
+ *             semister:
+ *               type: string
+ *             courses:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   course:
+ *                     type: string
+ *                     description: The course ID or name.
+ *                   title:
+ *                     type: string
+ *                     description: The title of the course.
+ *       400:
+ *         description: Bad request. Invalid input.
+ *       401:
+ *         description: Unauthorized. Authentication is required.
+ *       404:
+ *         description: Not found. No offerings found for the provided criteria.
+ *       500:
+ *         description: Internal server error. An error occurred while processing the request.
+ */
+Router.get("/Getoffering", Authetication, async (req, res) => {
+  try {
+    const offerdCourse = await CourseOffering.findOne({
+      department: req.body.department,
+      yearLevel: req.body.yearLevel,
+      semister: req.body.semister,
+    }).populate({
+      path: "courses.course",
+      model: "Course",
+    });
+
+    return res.send(offerdCourse);
+  } catch (err) {
+    res.send(err.message);
+  }
+});
+
+/**
+ * @swagger
  * /enrollment/GetSchedule:
  *   get:
  *     summary: Retrieve the class schedule for the current user
