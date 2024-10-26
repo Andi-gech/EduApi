@@ -151,18 +151,18 @@ Router.get("/", async (req, res) => {
  *         description: The ID of the complaint to update
  *         schema:
  *           type: string
- *       - in: body
- *         name: status
- *         required: true
- *         description: New status of the complaint
- *         schema:
- *           type: object
- *           required:
- *             - status
- *           properties:
- *             status:
- *               type: string
- *               example: "completed"
+ *     requestBody:    # Use requestBody instead of parameters for the body content
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 example: "completed"
  *     responses:
  *       200:
  *         description: The updated complaint
@@ -193,8 +193,13 @@ Router.get("/", async (req, res) => {
  *       500:
  *         description: Server error
  */
+
 Router.put("/:id", async (req, res) => {
   try {
+    console.log("Received request for updating status"); // Check if request is received
+    console.log("Params ID:", req.params.id); // Log ID parameter
+    console.log("Request Body:", req.body); // Log request body content
+
     const { status } = req.body;
     if (!status) return res.status(400).send("Status is required");
 
@@ -204,10 +209,15 @@ Router.put("/:id", async (req, res) => {
       { new: true }
     );
 
-    if (!updatedComplain) return res.status(404).send("Complaint not found");
+    if (!updatedComplain) {
+      console.log("Complaint not found"); // Log if complaint not found
+      return res.status(404).send("Complaint not found");
+    }
 
+    console.log("Updated Complaint:", updatedComplain); // Log updated complaint
     return res.send(updatedComplain);
   } catch (error) {
+    console.error("Error updating complaint:", error); // Use console.error for better visibility
     return res.status(500).send(error.message || "Something went wrong");
   }
 });
