@@ -2,7 +2,6 @@
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
-// Swagger options
 const options = {
   definition: {
     openapi: "3.0.0", // Specify the version of the OpenAPI specification
@@ -13,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000", // Your server URL
+        url: "https://eduapi.senaycreatives.com",
       },
     ],
     components: {
