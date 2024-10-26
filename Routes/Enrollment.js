@@ -310,14 +310,14 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *         name: yearLevel
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: The year level to filter course offerings.
  *       - in: query
  *         name: semister
  *         required: true
  *         schema:
  *           type: string
- *         description: The semester to filter course offerings (e.g., "Fall", "Spring").
+ *         description: The semester to filter course offerings (e.g., "1" for Fall, "2" for Spring).
  *     responses:
  *       200:
  *         description: A course offering object containing the details of the courses offered.
@@ -328,10 +328,13 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *               properties:
  *                 department:
  *                   type: string
+ *                   example: "Computer Science"
  *                 yearLevel:
- *                   type: integer
+ *                   type: string
+ *                   example: "2"
  *                 semister:
  *                   type: string
+ *                   example: "1"
  *                 courses:
  *                   type: array
  *                   items:
@@ -343,6 +346,21 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *                       title:
  *                         type: string
  *                         description: The title of the course.
+ *                       teacher:
+ *                         type: string
+ *                         description: The teacher's ID associated with the course.
+ *                       Schedule:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             day:
+ *                               type: string
+ *                               enum: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ]
+ *                               description: Day of the schedule.
+ *                             time:
+ *                               type: string
+ *                               description: The time slot for the course on that day.
  *       400:
  *         description: Bad request. Invalid input.
  *       401:
@@ -352,7 +370,8 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *       500:
  *         description: Internal server error. An error occurred while processing the request.
  */
-Router.get("/Getoffering", Authetication, async (req, res) => {
+
+Router.get("/Getoffering", async (req, res) => {
   try {
     const { department, yearLevel, semister } = req.query;
 
@@ -365,7 +384,7 @@ Router.get("/Getoffering", Authetication, async (req, res) => {
 
     const offeredCourse = await CourseOffering.findOne({
       department,
-      yearLevel: parseInt(yearLevel, 10),
+      yearLevel,
       semister,
     }).populate({
       path: "courses.course",
