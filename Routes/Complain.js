@@ -135,6 +135,83 @@ Router.get("/", async (req, res) => {
     return res.status(500).send;
   }
 });
+
+/**
+ * @swagger
+ * /api/complains/{id}:
+ *   put:
+ *     summary: Update the status of a specific complaint
+ *     description: Updates the status of a complaint by its ID. Status can be updated to values such as "pending," "completed," or "rejected."
+ *     tags:
+ *       - Complaints
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the complaint to update
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: status
+ *         required: true
+ *         description: New status of the complaint
+ *         schema:
+ *           type: object
+ *           required:
+ *             - status
+ *           properties:
+ *             status:
+ *               type: string
+ *               example: "completed"
+ *     responses:
+ *       200:
+ *         description: The updated complaint
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: The ID of the complaint
+ *                 status:
+ *                   type: string
+ *                   description: The updated status of the complaint
+ *                 complain:
+ *                   type: string
+ *                   description: The complaint description
+ *                 type:
+ *                   type: string
+ *                   description: The type of complaint
+ *                 user:
+ *                   type: string
+ *                   description: The ID of the user who filed the complaint
+ *       400:
+ *         description: Status is required or invalid input
+ *       404:
+ *         description: Complaint not found
+ *       500:
+ *         description: Server error
+ */
+Router.put("/:id", async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!status) return res.status(400).send("Status is required");
+
+    const updatedComplain = await Complain.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedComplain) return res.status(404).send("Complaint not found");
+
+    return res.send(updatedComplain);
+  } catch (error) {
+    return res.status(500).send(error.message || "Something went wrong");
+  }
+});
+
 /**
  * @swagger
  * /complain/{id}:
