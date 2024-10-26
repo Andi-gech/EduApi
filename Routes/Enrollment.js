@@ -80,7 +80,7 @@ Router.get("/currentEnrollment", Authetication, async (req, res) => {
     path: "course",
     model: "Course",
   });
-  console.log(enroll, "my enrollments");
+
   if (!enroll || enroll.length == 0)
     return res.status(400).send("You Have Not Registerd for this semister");
   res.send(enroll);
@@ -149,14 +149,14 @@ Router.post("/enroll", Authetication, async (req, res) => {
   });
 
   if (!user) return res.status(400).send("Invalid user");
-  console.log(user[0].Class, "yearLevel");
+
   const isAlreadyEnroll = await EnrollCourse.findOne({
     user: user[0]._id,
     currentYear: user[0].Class.yearLevel,
     currentSemester: user[0].Class.semister,
     course: req.body.course,
   });
-  console.log(isAlreadyEnroll, "isAlreadyEnroll");
+
   if (isAlreadyEnroll) return res.status(400).send("Already Enrolled");
 
   const Enrolled = EnrollCourse({
@@ -270,7 +270,6 @@ Router.get("/GetAllClass", async (req, res) => {
 
 Router.get("/GetMyoffering", Authetication, async (req, res) => {
   try {
-    console.log("getting Offering");
     const user = await User.find({
       auth: req.user._id,
     }).populate({
@@ -278,10 +277,6 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
       model: "Class",
     });
     if (!user) return res.status(400).send("Invalid user");
-    console.log("getting offering for ", user);
-    console.log(user[0].Class.department, "department");
-    console.log(user[0].Class.yearLevel);
-    console.log(user[0].Class.semister);
 
     const offerdCourse = await CourseOffering.findOne({
       department: user[0].Class.department,
@@ -291,11 +286,9 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
       path: "courses.course",
       model: "Course",
     });
-    console.log(offerdCourse.courses);
 
     return res.send(offerdCourse);
   } catch (err) {
-    console.log(err);
     res.send(err.message);
   }
 });
@@ -338,8 +331,6 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
 
 Router.get("/GetSchedule", Authetication, async (req, res) => {
   try {
-    console.log("getting Offering");
-
     // Fetch the user based on authentication
     const user = await User.find({
       auth: req.user._id,
@@ -349,8 +340,6 @@ Router.get("/GetSchedule", Authetication, async (req, res) => {
     });
 
     if (!user || user.length === 0) return res.status(400).send("Invalid user");
-    console.log(user[0].Class, "department");
-    // Fetch the offered courses based on the user's department, year level, and semester
     const offeredCourse = await CourseOffering.findOne({
       department: user[0].Class.department,
       yearLevel: user[0].Class.yearLevel,
@@ -368,7 +357,7 @@ Router.get("/GetSchedule", Authetication, async (req, res) => {
     // Loop through the courses and schedule them by day
     offeredCourse.courses.forEach((courseObj) => {
       const course = courseObj.course; // Populated course details
-      console.log(course);
+
       courseObj.Schedule.forEach((schedule) => {
         const day = schedule.day;
         const time = schedule.time;
@@ -386,9 +375,6 @@ Router.get("/GetSchedule", Authetication, async (req, res) => {
       });
     });
 
-    console.log(scheduleByDay);
-
-    // Send the schedule grouped by day
     return res.status(200).send(scheduleByDay);
   } catch (err) {
     console.error(err);
@@ -459,7 +445,7 @@ Router.get("/GetSchedule", Authetication, async (req, res) => {
  */
 Router.post("/assignCourse", async (req, res) => {
   const { error } = validate(req.body);
-  console.log(req.body);
+
   if (error) return res.status(400).send(error.details[0].message);
   const courses = await CourseOffering.find({
     department: req.body.department,
@@ -538,7 +524,7 @@ Router.post("/assignCourse", async (req, res) => {
 Router.post("/CreateCourse", async (req, res) => {
   const { error } = ValidateCourse(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  console.log(req.body);
+
   const course = new Course({
     Coursename: req.body.Coursename,
     Coursecode: req.body.Coursecode,

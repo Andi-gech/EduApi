@@ -125,8 +125,6 @@ Router.post("/register", async (req, res) => {
 
     const hashedPassword = securePassword(req.body.auth.password);
 
-    // Create new Auth document
-    console.log("classRoom");
     auth = new Auth({
       email: req.body.auth.email,
       password: hashedPassword,
@@ -147,7 +145,6 @@ Router.post("/register", async (req, res) => {
       classRoom = new Class(req.body.class);
       await classRoom.save({ session });
     }
-    console.log(classRoom, "classRoom is created");
 
     // Create new User document
     const user = new User({
@@ -188,8 +185,6 @@ Router.post("/register", async (req, res) => {
       },
     });
   } catch (err) {
-    // Abort transaction on error
-    console.log(err);
     await session.abortTransaction();
 
     session.endSession();
@@ -297,7 +292,6 @@ Router.post("/login", async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
     res.send(err.message);
   }
 });

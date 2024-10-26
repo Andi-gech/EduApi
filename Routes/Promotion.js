@@ -4,11 +4,11 @@ const { Class } = require("../Model/Class");
 const mongoose = require("mongoose");
 
 const Router = express.Router();
-const Years = ["1", "2", "3", "4", "5"];
+const Years = ["1", "2", "3", "4", "5", "Graduated"];
 
 /**
  * @swagger
- * /promote:
+ * /promotion/promote:
  *   post:
  *     summary: Promote students to the next academic year or semester
  *     description: This endpoint promotes students by updating their semester and year level. If a student's semester is 2, their year level is incremented. If the semester is 1, it is incremented to 2. Requires appropriate permissions.
@@ -36,31 +36,33 @@ const Years = ["1", "2", "3", "4", "5"];
  *                   example: "Internal server error."
  */
 Router.post("/promote", async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     const classToUpdate = await Class.find().session(session);
-    console.log(classToUpdate);
 
-    const updatedclass = classToUpdate.map(async (classroom) => {
-      console.log("classroom semester is ", classroom.semister);
+    const updatedClasses = classToUpdate.map((classroom) => {
+      if (classroom.yearLevel === "Graduated") {
+        // Skip if student has already graduated
+        return classroom;
+      }
+
       if (classroom.semister === "2") {
-        console.log("classroom semester is ", classroom.semister);
-        if (Years.indexOf(classroom.yearLevel) !== Years.length - 1) {
-          classroom.yearLevel = Years[Years.indexOf(classroom.yearLevel) + 1];
-          classroom.semister = "1";
+        // If the student has completed semester 2, promote their year level
+        const nextYearIndex = Years.indexOf(classroom.yearLevel) + 1;
+        if (nextYearIndex < Years.length) {
+          classroom.yearLevel = Years[nextYearIndex];
+          classroom.semister = classroom.yearLevel === "Graduated" ? null : "1"; // Reset semester or clear for graduates
         }
       } else if (classroom.semister === "1") {
-        // Increase the semester if the semester is 1
+        // Move from semester 1 to semester 2 within the same year level
         classroom.semister = "2";
       }
+      return classroom;
     });
 
-    await Promise.all(updatedclass);
-
     await Class.bulkWrite(
-      classToUpdate.map((classroom) => ({
+      updatedClasses.map((classroom) => ({
         updateOne: {
           filter: { _id: classroom._id },
           update: {
@@ -70,16 +72,18 @@ Router.post("/promote", async (req, res) => {
             },
           },
         },
-      }))
+      })),
+      { session }
     );
 
     await session.commitTransaction();
-    session.endSession();
-
     res.status(200).json({ message: "Users promoted successfully." });
   } catch (error) {
-    console.error(error);
+    await session.abortTransaction();
+    console.error("Error promoting users:", error);
     res.status(500).json({ error: "Internal server error." });
+  } finally {
+    session.endSession();
   }
 });
 

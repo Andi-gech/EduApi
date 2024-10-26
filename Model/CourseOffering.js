@@ -75,7 +75,7 @@ CourseOfferingSchema.pre("save", async function (next) {
     const courses = await mongoose
       .model("Course")
       .find({ _id: { $in: courseIds } });
-    console.log(courses);
+
     if (courses.length !== courseIds.length) {
       throw new Error("One or more courses do not exist.");
     }

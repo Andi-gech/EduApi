@@ -73,11 +73,9 @@ Router.post(
   upload.single("Image"),
   async (req, res) => {
     try {
-      console.log(req.body);
       const { error } = validatePost(req.body);
       const uploadedFile = req.file;
       if (!uploadedFile) {
-        console.log("No file uploaded");
         return res.status(400).send("No file uploaded");
       }
 
@@ -92,7 +90,6 @@ Router.post(
       await post.save();
       return res.send(post);
     } catch (err) {
-      console.log(err);
       res.status(500).send(err.message || "Something went wrong");
     }
   }

@@ -13,8 +13,7 @@ Router.post("/", Authetication, async (req, res) => {
   try {
     const { error } = validateUser(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-    console.log("user registration");
-    console.log(req.body);
+
     const classRoom = await Class.findOne({
       department: req.body.department,
       year: req.body.yearLevel,
@@ -98,7 +97,6 @@ Router.get("/me", Authetication, async (req, res) => {
 
     res.send(user);
   } catch (err) {
-    console.log(err);
     res.send(err.message);
   }
 });
@@ -142,7 +140,6 @@ Router.get("/GenerateQR", Authetication, async (req, res) => {
 
     return res.send(qrcode);
   } catch (err) {
-    console.log(err);
     res.send(err.message);
   }
 });
@@ -183,7 +180,6 @@ Router.get("/GenerateQR", Authetication, async (req, res) => {
  */
 Router.get("/getprofilepic/:id", Authetication, async (req, res) => {
   try {
-    console.log(req.params.id);
     const user = await User.findById(req.params.id, { profilePic: 1 });
     if (!user) return res.status(400).send("User not found");
     res.send(user.profilePic);
@@ -240,7 +236,6 @@ Router.put(
   upload.single("profilePic"),
   async (req, res) => {
     try {
-      console.log("update profile pic");
       const uploadedFile = req.file;
       if (!uploadedFile) return res.status(400).send("No file uploaded");
       req.body.profilePic = uploadedFile.path;
@@ -251,8 +246,6 @@ Router.put(
         },
         { new: true }
       );
-
-      console.log(user);
 
       res.send(user);
     } catch (err) {
@@ -305,14 +298,12 @@ Router.post("/verifyQR", async (req, res) => {
 
     // Extract encrypted data and signature from QR code
     const data = qrurl.split(":");
-    console.log(data);
 
     const encrypted = data[0] + ":" + data[1];
     const signed = data[2];
 
     // Decrypt the encrypted data
     const datatoDecode = decrypt(encrypted);
-    console.log(encrypted, "datatoDecode");
 
     // Verify the signature
     const verified = verifyData(encrypted, signed);
@@ -378,7 +369,6 @@ Router.get("/:id", async (req, res) => {
 
     res.send(user);
   } catch (err) {
-    console.log(err);
     res.send(err.message);
   }
 });

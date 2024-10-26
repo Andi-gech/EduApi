@@ -1,32 +1,28 @@
-const {Chatroom}=require("../Model/Chatrooms")
-const {User}=require("../Model/User")
+const { Chatroom } = require("../Model/Chatrooms");
+const { User } = require("../Model/User");
 
-const EnsureChatrooms=async(req,res,next)=>{
-    try {
-        // Check if the user has a chat room named "ask"
-        const askRoom = await Chatroom.findOne({
-            name: "ask",
-            user: req.user._id
-        });
+const EnsureChatrooms = async (req, res, next) => {
+  try {
+    // Check if the user has a chat room named "ask"
+    const askRoom = await Chatroom.findOne({
+      name: "ask",
+      user: req.user._id,
+    });
 
-        // Create "ask" room if not found
-        if (!askRoom) {
-            await Chatroom.create({
-                name: "ask",
-                user: req.user._id
-            });
-        }
-        console.log("Ensuring chat rooms...");
-       
-
-      
-
-        // Proceed to the next middleware or route handler
-        next();
-    } catch (err) {
-        console.error("Error ensuring chat rooms:", err);
-        res.status(500).send("Internal Server Error");
+    // Create "ask" room if not found
+    if (!askRoom) {
+      await Chatroom.create({
+        name: "ask",
+        user: req.user._id,
+      });
     }
-}
 
-module.exports=EnsureChatrooms
+    // Proceed to the next middleware or route handler
+    next();
+  } catch (err) {
+    console.error("Error ensuring chat rooms:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+module.exports = EnsureChatrooms;

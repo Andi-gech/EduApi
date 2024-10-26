@@ -374,8 +374,6 @@ Router.put("/approve/:id", AuthMiddleware, async (req, res) => {
     await notification.save();
 
     const socketId = userSocketMap.get(permission.user.toString());
-    console.log(permission.user, "emited to socketId");
-    console.log(socketId, "socketId");
 
     io.to(socketId).emit("notification", notification);
     return res.send(permission);

@@ -196,10 +196,6 @@ Router.get("/", async (req, res) => {
 
 Router.put("/:id", async (req, res) => {
   try {
-    console.log("Received request for updating status"); // Check if request is received
-    console.log("Params ID:", req.params.id); // Log ID parameter
-    console.log("Request Body:", req.body); // Log request body content
-
     const { status } = req.body;
     if (!status) return res.status(400).send("Status is required");
 
@@ -210,11 +206,9 @@ Router.put("/:id", async (req, res) => {
     );
 
     if (!updatedComplain) {
-      console.log("Complaint not found"); // Log if complaint not found
       return res.status(404).send("Complaint not found");
     }
 
-    console.log("Updated Complaint:", updatedComplain); // Log updated complaint
     return res.send(updatedComplain);
   } catch (error) {
     console.error("Error updating complaint:", error); // Use console.error for better visibility

@@ -13,7 +13,7 @@ const options = {
     },
     servers: [
       {
-        url: "https://eduapi.senaycreatives.com", // Your server URL
+        url: "http://localhost:3000", // Your server URL
       },
     ],
     components: {

@@ -52,7 +52,6 @@ const initializeSocket = (server) => {
           sender: userId,
           message: msg.message,
         });
-        console.log(userId, "dd");
       } catch (err) {
         console.error("Error sending message:", err);
       }

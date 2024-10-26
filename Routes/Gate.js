@@ -51,7 +51,7 @@ Router.put(
       const isvalidMongooseId = mongoose.Types.ObjectId.isValid(req.params.id);
       if (!isvalidMongooseId) return res.status(400).send("Invalid id");
       const user = await User.findOne({ auth: req.params.id });
-      console.log(user, req.params.id);
+
       if (!user) return res.status(400).send("User not found");
       user.incomponund = true;
       await user.save();
@@ -107,7 +107,7 @@ Router.put(
       const isvalidMongooseId = mongoose.Types.ObjectId.isValid(req.params.id);
       if (!isvalidMongooseId) return res.status(400).send("Invalid id");
       const user = await User.findOne({ auth: req.params.id });
-      console.log(user, req.params.id);
+
       if (!user) return res.status(400).send("User not found");
       user.incomponund = false;
       await user.save();
