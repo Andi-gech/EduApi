@@ -295,7 +295,7 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
 /**
  * @swagger
  * /enrollment/Getoffering:
- *   get:
+ *   post:  # Change from 'get' to 'post' since you're expecting a request body
  *     summary: Retrieve course offerings
  *     description: Get the list of course offerings based on the specified department, year level, and semester.
  *     tags: [Course Offering]
@@ -348,9 +348,10 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *       500:
  *         description: Internal server error. An error occurred while processing the request.
  */
-Router.get("/Getoffering", async (req, res) => {
+Router.post("/Getoffering", async (req, res) => {
+  // Changed to 'post' to match Swagger
   try {
-    const offerdCourse = await CourseOffering.findOne({
+    const offeredCourse = await CourseOffering.findOne({
       department: req.body.department,
       yearLevel: req.body.yearLevel,
       semister: req.body.semister,
@@ -359,9 +360,15 @@ Router.get("/Getoffering", async (req, res) => {
       model: "Course",
     });
 
-    return res.send(offerdCourse);
+    if (!offeredCourse) {
+      return res
+        .status(404)
+        .send({ message: "No offerings found for the provided criteria." });
+    }
+
+    return res.send(offeredCourse);
   } catch (err) {
-    res.send(err.message);
+    res.status(500).send({ message: err.message });
   }
 });
 
