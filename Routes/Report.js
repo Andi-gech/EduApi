@@ -96,12 +96,11 @@ Router.get("/activeSubscriptions", async (req, res) => {
  * @swagger
  * /report/department:
  *   get:
- *     summary: Retrieve user count by department
- *     description: Returns the count of users in each department along with the percentage of total users.
- *     tags: [Department Statistics]
+ *     summary: Get user count by department
+ *     description: Returns the number of users grouped by their department. If a department has no users, it will still be included in the response with a count of 0.
  *     responses:
  *       200:
- *         description: User count by department along with percentage
+ *         description: A list of departments with the number of users in each.
  *         content:
  *           application/json:
  *             schema:
@@ -111,55 +110,72 @@ Router.get("/activeSubscriptions", async (req, res) => {
  *                 properties:
  *                   department:
  *                     type: string
- *                     description: Name of the department.
- *                     example: "Computer Science"
+ *                     description: The name of the department.
  *                   count:
  *                     type: integer
- *                     description: Number of users in the department.
- *                     example: 30
- *                   percentage:
- *                     type: number
- *                     description: Percentage of total users in the department.
- *                     example: 30.0
+ *                     description: The number of users in the department.
  *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message describing the issue.
- *                   example: "Something went wrong."
+ *         description: Internal Server Error
  */
 Router.get("/department", async (req, res) => {
-  const department = [
-    "Computer Science",
-    "electronics",
-    "civil",
-    "Mechanical",
-    "Electrical",
-    "Aeronautical",
-    "Production",
-    "chemical",
-    "Motor Vehicles",
-  ];
+  try {
+    // Array of all possible departments
+    const allDepartments = [
+      "Computer Science",
+      "Electronics",
+      "Civil",
+      "Mechanical",
+      "Electrical",
+      "Aeronautical",
+      "Production",
+      "Chemical",
+      "Motor Vehicles",
+    ];
 
-  const counts = await Promise.all(
-    department.map(async (d) => ({
-      department: d,
-      count: await User.countDocuments({ department: d }),
-    }))
-  );
-  const total = counts.reduce((t, c) => t + c.count, 0);
-  const result = counts.map((c) => ({
-    department: c.department,
-    count: c.count,
-    percentage: (c.count / total) * 100,
-  }));
+    const departmentCounts = await User.aggregate([
+      {
+        $lookup: {
+          from: "classes", // The name of the collection for Class model
+          localField: "Class", // Field in User that references Class
+          foreignField: "_id", // Field in Class that is referenced
+          as: "classInfo", // Output array field
+        },
+      },
+      {
+        $unwind: {
+          path: "$classInfo",
+          preserveNullAndEmptyArrays: true, // Preserve users without a class
+        },
+      },
+      {
+        $group: {
+          _id: "$classInfo.department", // Group by department
+          count: { $sum: 1 }, // Count the number of users
+        },
+      },
+      {
+        $project: {
+          department: "$_id",
+          count: 1,
+          _id: 0, // Exclude _id from the output
+        },
+      },
+    ]);
 
-  return res.send(result);
+    // Prepare final report with zero counts for departments with no users
+    const finalReport = allDepartments.map((department) => {
+      const found = departmentCounts.find((d) => d.department === department);
+      return {
+        department,
+        count: found ? found.count : 0, // Default to 0 if not found
+      };
+    });
+
+    res.status(200).json(finalReport);
+  } catch (error) {
+    console.error("Error fetching department report:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 module.exports = Router;
