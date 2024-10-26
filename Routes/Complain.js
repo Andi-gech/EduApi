@@ -138,12 +138,12 @@ Router.get("/", async (req, res) => {
 
 /**
  * @swagger
- * /api/complains/{id}:
+ * /complain/{id}:
  *   put:
  *     summary: Update the status of a specific complaint
  *     description: Updates the status of a complaint by its ID. Status can be updated to values such as "pending," "completed," or "rejected."
  *     tags:
- *       - Complaints
+ *       - Complain
  *     parameters:
  *       - in: path
  *         name: id
