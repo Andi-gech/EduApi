@@ -173,43 +173,45 @@ Router.post("/enroll", Authetication, async (req, res) => {
 /**
  * @swagger
  * /enrollment/GetAllClass:
- *  get:
- *   summary: Retrieve all class information
- *  description: Returns all class information
- * tags: [Class]
- * responses:
- * 200:
- * description: Successfully retrieved class information.
- * content:
- * application/json:
- * schema:
- * type: object
- * properties:
- * _id:
- * type: string
- * description: Class ID
- * example: "60a8e3622f8b9a3a4c8b9f13"
- * yearLevel:
- * type: integer
- * description: Year level of the class
- * example: 3
- * department:
- * type: string
- * description: Department of the class
- * example: "Computer Science"
- * semister:
- * type: integer
- * description: Semester of the class
- * example: 2
- * date:
- * type: string
- * description: Date of the class
- * example: "2021-05-21T00:00:00.000Z"
- * 400:
- * description: No class information found.
- * 500:
- * description: Internal server error.
- * */
+ *   get:
+ *     summary: Retrieve all class information
+ *     description: Returns all class information
+ *     tags:
+ *       - Class
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved class information.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: Class ID
+ *                   example: "60a8e3622f8b9a3a4c8b9f13"
+ *                 yearLevel:
+ *                   type: integer
+ *                   description: Year level of the class
+ *                   example: 3
+ *                 department:
+ *                   type: string
+ *                   description: Department of the class
+ *                   example: "Computer Science"
+ *                 semester:
+ *                   type: integer
+ *                   description: Semester of the class
+ *                   example: 2
+ *                 date:
+ *                   type: string
+ *                   description: Date of the class
+ *                   example: "2021-05-21T00:00:00.000Z"
+ *       400:
+ *         description: No class information found.
+ *       500:
+ *         description: Internal server error.
+ */
+
 Router.get("/GetAllClass", async (req, res) => {
   const classs = await Class.find();
   res.send(classs);
