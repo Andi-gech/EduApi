@@ -295,50 +295,54 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
 /**
  * @swagger
  * /enrollment/Getoffering:
- *   post:  # Change from 'get' to 'post' since you're expecting a request body
+ *   get:
  *     summary: Retrieve course offerings
  *     description: Get the list of course offerings based on the specified department, year level, and semester.
  *     tags: [Course Offering]
  *     parameters:
- *       - in: body
- *         name: body
- *         description: Department, year level, and semester to filter the course offerings.
+ *       - in: query
+ *         name: department
  *         required: true
  *         schema:
- *           type: object
- *           properties:
- *             department:
- *               type: string
- *               description: The department to filter course offerings.
- *             yearLevel:
- *               type: integer
- *               description: The year level to filter course offerings.
- *             semister:
- *               type: string
- *               description: The semester to filter course offerings (e.g., "Fall", "Spring").
+ *           type: string
+ *         description: The department to filter course offerings.
+ *       - in: query
+ *         name: yearLevel
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The year level to filter course offerings.
+ *       - in: query
+ *         name: semister
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The semester to filter course offerings (e.g., "Fall", "Spring").
  *     responses:
  *       200:
  *         description: A course offering object containing the details of the courses offered.
- *         schema:
- *           type: object
- *           properties:
- *             department:
- *               type: string
- *             yearLevel:
- *               type: integer
- *             semister:
- *               type: string
- *             courses:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   course:
- *                     type: string
- *                     description: The course ID or name.
- *                   title:
- *                     type: string
- *                     description: The title of the course.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 department:
+ *                   type: string
+ *                 yearLevel:
+ *                   type: integer
+ *                 semister:
+ *                   type: string
+ *                 courses:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       course:
+ *                         type: string
+ *                         description: The course ID or name.
+ *                       title:
+ *                         type: string
+ *                         description: The title of the course.
  *       400:
  *         description: Bad request. Invalid input.
  *       401:
@@ -348,13 +352,21 @@ Router.get("/GetMyoffering", Authetication, async (req, res) => {
  *       500:
  *         description: Internal server error. An error occurred while processing the request.
  */
-Router.post("/Getoffering", async (req, res) => {
-  // Changed to 'post' to match Swagger
+Router.get("/Getoffering", Authetication, async (req, res) => {
   try {
+    const { department, yearLevel, semister } = req.query;
+
+    // Ensure all required query parameters are provided
+    if (!department || !yearLevel || !semister) {
+      return res
+        .status(400)
+        .send({ message: "Missing required query parameters" });
+    }
+
     const offeredCourse = await CourseOffering.findOne({
-      department: req.body.department,
-      yearLevel: req.body.yearLevel,
-      semister: req.body.semister,
+      department,
+      yearLevel: parseInt(yearLevel, 10),
+      semister,
     }).populate({
       path: "courses.course",
       model: "Course",
